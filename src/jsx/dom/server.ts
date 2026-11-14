@@ -37,20 +37,14 @@ const renderToString = (element: Child, options: RenderToStringOptions = {}): st
   return res
 }
 
+/** Only `onError` is currently supported by Hono's streaming renderer. */
 export interface RenderToReadableStreamOptions {
-  identifierPrefix?: string
-  namespaceURI?: string
-  nonce?: string
-  bootstrapScriptContent?: string
-  bootstrapScripts?: string[]
-  bootstrapModules?: string[]
-  progressiveChunkSize?: number
-  signal?: AbortSignal
   onError?: (error: unknown) => string | void
 }
 
 /**
- * Render JSX element to readable stream.
+ * Render JSX element to readable stream. Only `onError` is supported; options
+ * such as `identifierPrefix`, bootstrap scripts, and abort signals are not.
  * @param element JSX element to render.
  * @param options Options for rendering.
  * @returns Rendered readable stream.

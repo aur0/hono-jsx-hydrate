@@ -50,17 +50,35 @@
     "./bun": {
       "types": "./bun.d.ts",
       "import": "./bun.js"
+    },
+    "./vite": {
+      "types": "./vite.d.ts",
+      "import": "./vite.js"
     }
   },
-  "files": ["dist", "src", "LICENSE", "README.md", "bun.js", "bun.d.ts"],
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md",
+    "bun.js",
+    "bun.d.ts",
+    "vite.js",
+    "vite.d.ts"
+  ],
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "test": "npm run test:hydration && npm run test:vite",
+    "test:vite": "node test/vite-smoke.mjs",
+    "test:hydration": "node test/hydration-compatibility.mjs"
   },
   "peerDependencies": {
     "hono": "4.13.17"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "esbuild": "^0.28.2",
-    "hono": "4.13.17"
+    "hono": "4.13.17",
+    "vite": "^8.3.8"
   }
 }

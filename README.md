@@ -15,10 +15,63 @@ This project is derived from Hono v4.13.17 (commit `61f7c59e50244ab4d2dd83c15192
 ## Install from GitHub
 
 ```sh
-bun add github:aur0/hono-jsx-hydrate
+npm install github:aur0/hono-jsx-hydrate
 ```
 
-The package pins its peer dependency to Hono 4.13.17. In a project using Vite, configure the patched package's JSX modules as aliases:
+You can also install it with Bun using `bun add github:aur0/hono-jsx-hydrate`.
+
+The package pins its peer dependency to Hono 4.13.17. Your application code continues importing from `hono/jsx` and `hono/jsx/dom`; configure your bundler to resolve those specifiers to this package's patched, shared build. The package also has direct `hono-jsx-hydrate/jsx/...` exports for explicit use, but mixing direct package paths and Hono paths can load duplicate runtime state. Use one resolution strategy throughout the app.
+
+## SSR counter example
+
+The server sends the button as HTML. The browser hydrates that same button and adds state and click behavior:
+
+```tsx
+// server.tsx — compiled with JSX import source `hono/jsx`
+import { Hono } from 'hono'
+import { jsx } from 'hono/jsx'
+import { renderToString } from 'hono/jsx/dom/server'
+
+const app = new Hono()
+const counterMarkup = renderToString(jsx('button', { id: 'count', children: '0' }))
+
+app.get('/', (c) => c.html(
+  <html><body>
+    <div id="root" dangerouslySetInnerHTML={{ __html: counterMarkup }} />
+    <script type="module" src="/client.js" />
+  </body></html>
+))
+```
+
+```tsx
+// client.tsx — compiled with JSX import source `hono/jsx/dom`
+import { useState } from 'hono/jsx/dom'
+import { hydrateRoot } from 'hono/jsx/dom/client'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button id="count" onClick={() => setCount(count + 1)}>{count}</button>
+}
+
+hydrateRoot(document.getElementById('root')!, <Counter />)
+```
+
+Serve the compiled client entry at `/client.js`. Hydration adopts the server button when its markup matches, then clicks update it without replacing the element.
+
+### Vite
+
+The Vite plugin replaces the nine manual aliases:
+
+```ts
+import { defineConfig } from 'vite'
+import { honoJsxHydrateVitePlugin } from 'hono-jsx-hydrate/vite'
+
+export default defineConfig({
+  plugins: [honoJsxHydrateVitePlugin()],
+})
+```
+
+Set the JSX import source in your TypeScript config: `hono/jsx/dom` for browser components and `hono/jsx` for server-rendered JSX. The plugin redirects those runtime imports; it does not change JSX compilation settings.
 
 ### Bun's native bundler
 
@@ -50,31 +103,7 @@ const result = await Bun.build({
 if (!result.success) throw new AggregateError(result.logs, 'Bun build failed')
 ```
 
-Use the same plugin for server bundles that import Hono JSX, and set their JSX import source to `hono/jsx`. This plugin is specifically for Bun's bundler; the Vite setup below uses Vite aliases.
-
-### Vite aliases
-
-```ts
-import { defineConfig } from 'vite'
-import { fileURLToPath } from 'node:url'
-
-const pkg = fileURLToPath(new URL('./node_modules/hono-jsx-hydrate/', import.meta.url))
-const aliases = {
-  'hono/jsx/dom/client': `${pkg}dist/hono-jsx-dom-client.js`,
-  'hono/jsx/dom/jsx-runtime': `${pkg}dist/hono-jsx-dom-jsx-runtime.js`,
-  'hono/jsx/dom/jsx-dev-runtime': `${pkg}dist/hono-jsx-dom-jsx-dev-runtime.js`,
-  'hono/jsx/dom/server': `${pkg}dist/hono-jsx-dom-server.js`,
-  'hono/jsx/dom': `${pkg}dist/hono-jsx-dom.js`,
-  'hono/jsx/jsx-runtime': `${pkg}dist/hono-jsx-jsx-runtime.js`,
-  'hono/jsx/jsx-dev-runtime': `${pkg}dist/hono-jsx-jsx-dev-runtime.js`,
-  'hono/jsx/streaming': `${pkg}dist/hono-jsx-streaming.js`,
-  'hono/jsx': `${pkg}dist/hono-jsx.js`,
-}
-
-export default defineConfig({ resolve: { alias: aliases } })
-```
-
-Keep the DOM aliases and server aliases pointed at the matching package build so their shared hooks and JSX runtime state stay consistent. Set the browser JSX import source to `hono/jsx/dom`; use `hono/jsx` for SSR.
+Use the same plugin for server bundles that import Hono JSX, and set their JSX import source to `hono/jsx`.
 
 Import hydration as usual:
 
@@ -96,7 +125,7 @@ Render initial HTML with Hono's server JSX runtime and the matching server API:
 import { renderToString } from 'hono/jsx/dom/server'
 ```
 
-If using `useId`, pass the same `identifierPrefix` to `renderToString` and `hydrateRoot`.
+`renderToString` supports `identifierPrefix`; pass the same value to `hydrateRoot` when using `useId`. `renderToReadableStream` currently supports only `onError`; it does not implement `identifierPrefix` or other stream options.
 
 ## Hono JSX integration and support
 
@@ -116,8 +145,9 @@ This package keeps Hono's JSX and DOM component model. It patches the runtime; i
 | Component APIs | `createContext`, `useContext`, `createElement`, `cloneElement`, `memo`, `forwardRef`, `createRef`, `Children`, `Suspense`, `ErrorBoundary` | Available through the Hono DOM JSX runtime, with Hono's compatibility behavior. |
 | Other DOM APIs | `createPortal`, `flushSync`, `StrictMode`, `isValidElement`, `version` | Exported by the Hono DOM JSX runtime. |
 | Mismatch recovery | `onRecoverableError` | A structural or text mismatch reports an error and renders a replacement root. |
-| Vite integration | Aliases for Hono JSX entry points | The README's Vite example points all entry points at the package's shared ESM graph. |
-| Other bundlers | Use equivalent aliases or resolver plugins | Make all related entry points resolve to these same built files so they share hook state. This package does not currently ship a bundler plugin. |
+| Vite integration | `hono-jsx-hydrate/vite` plugin | Redirects Hono JSX entry points to the package's shared ESM graph. |
+| Bun integration | `hono-jsx-hydrate/bun` plugin | Redirects Hono JSX entry points when using `Bun.build()`. |
+| Other bundlers | Equivalent aliases or resolver plugins | Resolve all related Hono JSX entry points to this package's shared build. |
 
 Hydration is whole-root and intended for completed SSR output. Actively streaming Suspense boundaries, selective hydration, event replay before hydration, and deterministic IDs across concurrent async SSR are not supported.
 
@@ -130,26 +160,15 @@ Hydration is whole-root and intended for completed SSR output. Actively streamin
 
 ## Verification
 
-- The published GitHub package installed in a clean npm project; its package build and direct ESM/SSR import smoke check passed.
-- The 18 browser hydration compatibility scenarios passed using the GitHub-installed package source.
-- A clean Vite production build passed using the alias configuration above.
-- Bun's native bundler successfully built a client entry using `honoJsxHydrateBunPlugin()` from the GitHub-installed package.
-- The shipped source passed Hono's upstream DOM, hooks, and server suite: 1,022 passed, 6 skipped, across 18 test files.
-
-These checks cover the published source, runtime exports, hydration behavior, and the documented Vite alias setup. They do not test every listed API independently in every supported bundler.
+The repository includes a browser regression suite for SSR IDs, whole-root adoption, state and effects, controlled form values, Suspense retries, and mismatch recovery. Run it locally with `npm test`. GitHub Actions runs the build and browser suite on pushes and pull requests. The separate upstream Hono suite is useful for broader compatibility checks but is maintained outside this repo.
 
 ## Development
 
 ```sh
-bun install
-bun run build
-```
-
-Or, with npm:
-
-```sh
-npm install
+npm ci
 npm run build
+npx playwright install chromium
+npm test
 ```
 
-The build emits a shared ESM graph under `dist/`; keeping its chunks shared is important so JSX entrypoints use the same hook stores. Patch regression testing is currently performed in the parent Workspace Lab project.
+The build emits a shared ESM graph under `dist/`; keeping its chunks shared is important so JSX entrypoints use the same hook stores. Bun is optional; npm and other Node-compatible package managers work too.
