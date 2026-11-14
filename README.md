@@ -133,6 +133,7 @@ Hydration is whole-root and intended for completed SSR output. Actively streamin
 - The published GitHub package installed in a clean npm project; its package build and direct ESM/SSR import smoke check passed.
 - The 18 browser hydration compatibility scenarios passed using the GitHub-installed package source.
 - A clean Vite production build passed using the alias configuration above.
+- Bun's native bundler successfully built a client entry using `honoJsxHydrateBunPlugin()` from the GitHub-installed package.
 - The shipped source passed Hono's upstream DOM, hooks, and server suite: 1,022 passed, 6 skipped, across 18 test files.
 
 These checks cover the published source, runtime exports, hydration behavior, and the documented Vite alias setup. They do not test every listed API independently in every supported bundler.
