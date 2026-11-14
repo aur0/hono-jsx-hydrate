@@ -46,9 +46,13 @@
     "./jsx/dom/server": {
       "types": "./src/jsx/dom/server.ts",
       "import": "./dist/hono-jsx-dom-server.js"
+    },
+    "./bun": {
+      "types": "./bun.d.ts",
+      "import": "./bun.js"
     }
   },
-  "files": ["dist", "src", "LICENSE", "README.md"],
+  "files": ["dist", "src", "LICENSE", "README.md", "bun.js", "bun.d.ts"],
   "scripts": {
     "build": "node build.mjs"
   },

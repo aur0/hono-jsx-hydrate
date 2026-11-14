@@ -20,6 +20,40 @@ bun add github:aur0/hono-jsx-hydrate
 
 The package pins its peer dependency to Hono 4.13.17. In a project using Vite, configure the patched package's JSX modules as aliases:
 
+### Bun's native bundler
+
+For `Bun.build()`, use the package plugin to redirect Hono JSX imports to the shared patched runtime. Keep the component imports as `hono/jsx` or `hono/jsx/dom`; the plugin handles their resolution.
+
+```tsx
+/** @jsxImportSource hono/jsx/dom */
+import { hydrateRoot } from 'hono/jsx/dom/client'
+import { useState } from 'hono/jsx/dom'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+
+hydrateRoot(document.getElementById('root')!, <Counter />)
+```
+
+```ts
+import { honoJsxHydrateBunPlugin } from 'hono-jsx-hydrate/bun'
+
+const result = await Bun.build({
+  entrypoints: ['./src/client.tsx'],
+  outdir: './dist/client',
+  target: 'browser',
+  plugins: [honoJsxHydrateBunPlugin()],
+})
+
+if (!result.success) throw new AggregateError(result.logs, 'Bun build failed')
+```
+
+Use the same plugin for server bundles that import Hono JSX, and set their JSX import source to `hono/jsx`. This plugin is specifically for Bun's bundler; the Vite setup below uses Vite aliases.
+
+### Vite aliases
+
 ```ts
 import { defineConfig } from 'vite'
 import { fileURLToPath } from 'node:url'
