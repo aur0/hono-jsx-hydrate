@@ -2,6 +2,8 @@
 
 A patched [Hono](https://hono.dev/) JSX runtime that adds whole-root hydration for completed server-rendered HTML.
 
+> **Experimental:** This package is an early release and has not yet been validated across production applications. It is pinned to Hono 4.13.17. Integration smoke tests cover the environments listed below, but they do not replace testing in your app and deployment setup. Tree-shaking behavior and compatibility with other Hono versions are not verified.
+
 ## Why this exists
 
 Hono JSX includes **Client Components**: an interactive browser UI model using `hono/jsx/dom`, with a JSX renderer and React-like hooks. This package adds hydration so a Hono JSX view can render HTML on the server first, then attach its client behavior to that HTML.
@@ -22,7 +24,7 @@ npm install github:aur0/hono-jsx-hydrate
 
 The GitHub repository is public, so npm can install it directly from GitHub. For example, with pnpm use `pnpm add github:aur0/hono-jsx-hydrate`. This uses npm as the installer, but the package is not published to the npm registry yet; a registry release can be done separately.
 
-The package pins its peer dependency to Hono 4.13.17. Your application code continues importing from `hono/jsx` and `hono/jsx/dom`; configure your bundler to resolve those specifiers to this package's patched, shared build. The package also has direct `hono-jsx-hydrate/jsx/...` exports for explicit use, but mixing direct package paths and Hono paths can load duplicate runtime state. Use one resolution strategy throughout the app.
+The package pins its peer dependency to Hono 4.13.17. Your application code continues importing from `hono/jsx` and `hono/jsx/dom`; configure your bundler to resolve those specifiers to this package's patched, shared build. The package also has direct `hono-jsx-hydrate/jsx/...` exports for explicit use, but mixing direct package paths and Hono paths can load duplicate runtime state. Use one resolution strategy throughout the app. Before relying on it in production, test the hydration flow with your app's JSX setup, bundler, and deployment runtime.
 
 ## SSR counter example
 
