@@ -58,6 +58,27 @@ import { renderToString } from 'hono/jsx/dom/server'
 
 If using `useId`, pass the same `identifierPrefix` to `renderToString` and `hydrateRoot`.
 
+## Hono JSX integration and support
+
+This package keeps Hono's JSX and DOM component model. It patches the runtime; it does not provide a separate component framework. JSX entry points are aliased to this package's shared build so server and browser code use the matching Hono runtime.
+
+| Area | Supported | Notes |
+| --- | --- | --- |
+| Package managers and runtimes | Bun, npm, pnpm, and other Node-compatible tooling | Bun is optional. The package is ESM; use the package manager and bundler already in your app. |
+| Hono version | `hono@4.13.17` | The peer dependency is pinned to the version this patch was built against. |
+| JSX runtimes | `hono/jsx`, `hono/jsx/jsx-runtime`, `hono/jsx/jsx-dev-runtime` | Use `hono/jsx` for server rendering. |
+| DOM JSX runtimes | `hono/jsx/dom`, `hono/jsx/dom/jsx-runtime`, `hono/jsx/dom/jsx-dev-runtime` | Use `hono/jsx/dom` as the client JSX import source. |
+| Client rendering | `render`, `createRoot`, `root.render`, `root.unmount` | For client-only UI, use Hono's DOM renderer. |
+| Server rendering | `renderToString`, `renderToReadableStream` | The synchronous `renderToString` API supports `identifierPrefix`. |
+| Hydration | `hydrateRoot` | Attaches to completed server-rendered HTML and adopts matching DOM nodes. |
+| Hooks and transitions | `useState`, `useEffect`, `useRef`, `useCallback`, `use`, `useMemo`, `useReducer`, `useId`, `useSyncExternalStore`, `useLayoutEffect`, `useInsertionEffect`, `useDebugValue`, `useImperativeHandle`, `useTransition`, `useDeferredValue`, `useFormStatus`, `useActionState`, `useOptimistic`, `startTransition`, `startViewTransition`, `useViewTransition` | Hono's React-compatible or partially compatible APIs; see the [Hono Client Components guide](https://hono.dev/docs/guides/jsx-dom) for Hono's compatibility notes. |
+| Component APIs | `createContext`, `useContext`, `createElement`, `cloneElement`, `memo`, `forwardRef`, `createRef`, `Children`, `Suspense`, `ErrorBoundary` | Available through the Hono DOM JSX runtime, with Hono's compatibility behavior. |
+| Mismatch recovery | `onRecoverableError` | A structural or text mismatch reports an error and renders a replacement root. |
+| Vite integration | Aliases for Hono JSX entry points | The README's Vite example points all entry points at the package's shared ESM graph. |
+| Other bundlers | Use equivalent aliases or resolver plugins | Make all related entry points resolve to these same built files so they share hook state. This package does not currently ship a bundler plugin. |
+
+Hydration is whole-root and intended for completed SSR output. Actively streaming Suspense boundaries, selective hydration, event replay before hydration, and deterministic IDs across concurrent async SSR are not supported.
+
 ## Scope
 
 - Hydrates completed SSR output as a whole root.
@@ -70,6 +91,13 @@ If using `useId`, pass the same `identifierPrefix` to `renderToString` and `hydr
 ```sh
 bun install
 bun run build
+```
+
+Or, with npm:
+
+```sh
+npm install
+npm run build
 ```
 
 The build emits a shared ESM graph under `dist/`; keeping its chunks shared is important so JSX entrypoints use the same hook stores. Patch regression testing is currently performed in the parent Workspace Lab project.
