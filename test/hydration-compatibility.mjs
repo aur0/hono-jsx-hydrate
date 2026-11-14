@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { build } from 'esbuild'
-import { chromium } from '@playwright/test'
+import { chromium, firefox, webkit } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
 
@@ -52,7 +52,13 @@ const clientCode = await bundle(`
   };
   window.start();
 `)
-const browser = await chromium.launch({ headless: true, ...(process.env.CI ? {} : { channel: 'chrome' }) })
+const browserName = process.env.HYDRATION_BROWSER || 'chromium'
+const browserType = { chromium, firefox, webkit }[browserName]
+if (!browserType) throw new Error(`Unsupported HYDRATION_BROWSER: ${browserName}`)
+const browser = await browserType.launch({
+  headless: true,
+  ...(browserName === 'chromium' && !process.env.CI ? { channel: 'chrome' } : {}),
+})
 let passed = 0
 try {
   async function fixture(name, run, markup = html[name], options = {}) {

@@ -1,2 +1,4 @@
 node_modules/
 bun-smoke/
+test/.parcel-smoke-*/
+.parcel-cache/

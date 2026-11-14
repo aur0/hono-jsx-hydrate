@@ -164,7 +164,24 @@ Hydration is whole-root and intended for completed SSR output. Actively streamin
 
 ## Verification
 
-The repository includes a browser regression suite for SSR IDs, whole-root adoption, state and effects, controlled form values, Suspense retries, and mismatch recovery. Run it locally with `npm test`. GitHub Actions runs the build and browser suite on pushes and pull requests. The separate upstream Hono suite is useful for broader compatibility checks but is maintained outside this repo.
+The repository includes browser regression coverage for DOM adoption, SSR IDs, state and effects, controlled form values, Suspense retries, mismatch recovery, multiple roots, and unmounting. Run the Node, Vite, esbuild, and Worker integration checks with `npm test`. Run the five additional bundler checks with `npm run test:bundlers`, the Deno SSR check with `npm run test:deno`, and the Bun bundler smoke check with `npm run test:bun` in a Bun installation.
+
+| Area | Verification | Limits |
+| --- | --- | --- |
+| Browser hydration | Chromium, Firefox, and WebKit run the 18 scenario suite | The exact browser versions are those installed by the current Playwright release. |
+| Vite | Vite 8 dev, production client preview, and SSR build | Other Vite major versions and deployment adapters are not verified. |
+| esbuild | Consumer-style client bundle plus Hono SSR bundled for Workers | Resolver setup is tested in this fixture; no general esbuild plugin is shipped. |
+| Bun | Bun 1.4.4 `Bun.build()` smoke build through `honoJsxHydrateBunPlugin()` | CI checks bundling; this does not exercise a Bun-hosted HTTP server. |
+| Cloudflare Workers | Hono SSR runs in Miniflare 4.20260730.0's local Workerd runtime; the resulting HTML hydrates in Chromium | This is a local simulator test, not a deployment to Cloudflare's hosted network. |
+| Node.js | Vite SSR output is imported in Node and compared with dev SSR output | Other Node server adapters are not tested. |
+| Deno | Deno 2.9.6 runs Hono SSR against the built ESM runtime | Tests server rendering; browser hydration in Deno Deploy is not tested. |
+| Rollup | Rollup 4.68.3 bundles a consumer entry; Chromium verifies DOM adoption and state updates | Uses explicit entry aliases; no Rollup plugin is shipped. |
+| Webpack | Webpack 5.112.2 production bundle; Chromium verifies DOM adoption and state updates | Uses explicit resolver aliases; no Webpack plugin is shipped. |
+| Rspack | Rspack 2.3.2 production bundle; Chromium verifies DOM adoption and state updates | Uses explicit resolver aliases; no Rspack plugin is shipped. |
+| Parcel | Parcel 2.16.4 production bundle; Chromium verifies DOM adoption and state updates | Uses `package.json` aliases; no Parcel plugin is shipped. |
+| Rolldown | Rolldown 1.3.2 bundle; Chromium verifies DOM adoption and state updates | Uses `resolve.alias`; no Rolldown plugin is shipped. |
+
+GitHub Actions runs the Node/Vite/esbuild/Worker checks, Chromium/Firefox/WebKit hydration matrix, Bun bundler smoke test, Deno SSR check, and separate bundler jobs for Rollup, Webpack, Rspack, Parcel, and Rolldown on pushes and pull requests. The separate upstream Hono suite is useful for broader compatibility checks but is maintained outside this repo.
 
 ## Development
 
