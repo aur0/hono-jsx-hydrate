@@ -1,0 +1,62 @@
+{
+  "name": "hono-jsx-hydrate",
+  "version": "0.1.0",
+  "description": "A patched Hono JSX runtime with DOM hydration for completed server-rendered HTML",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/hono-jsx.js",
+  "types": "./src/jsx/index.ts",
+  "exports": {
+    "./jsx": {
+      "types": "./src/jsx/index.ts",
+      "import": "./dist/hono-jsx.js"
+    },
+    "./jsx/jsx-runtime": {
+      "types": "./src/jsx/jsx-runtime.ts",
+      "import": "./dist/hono-jsx-jsx-runtime.js"
+    },
+    "./jsx/jsx-dev-runtime": {
+      "types": "./src/jsx/jsx-dev-runtime.ts",
+      "import": "./dist/hono-jsx-jsx-dev-runtime.js"
+    },
+    "./jsx/streaming": {
+      "types": "./src/jsx/streaming.ts",
+      "import": "./dist/hono-jsx-streaming.js"
+    },
+    "./jsx/dom": {
+      "types": "./src/jsx/dom/index.ts",
+      "import": "./dist/hono-jsx-dom.js"
+    },
+    "./jsx/dom/jsx-runtime": {
+      "types": "./src/jsx/dom/jsx-runtime.ts",
+      "import": "./dist/hono-jsx-dom-jsx-runtime.js"
+    },
+    "./jsx/dom/jsx-dev-runtime": {
+      "types": "./src/jsx/dom/jsx-dev-runtime.ts",
+      "import": "./dist/hono-jsx-dom-jsx-dev-runtime.js"
+    },
+    "./jsx/dom/client": {
+      "types": "./src/jsx/dom/client.ts",
+      "import": "./dist/hono-jsx-dom-client.js"
+    },
+    "./jsx/dom/css": {
+      "types": "./src/jsx/dom/css.ts",
+      "import": "./dist/hono-jsx-dom-css.js"
+    },
+    "./jsx/dom/server": {
+      "types": "./src/jsx/dom/server.ts",
+      "import": "./dist/hono-jsx-dom-server.js"
+    }
+  },
+  "files": ["dist", "src", "LICENSE", "README.md"],
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "peerDependencies": {
+    "hono": "4.13.17"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "hono": "4.13.17"
+  }
+}

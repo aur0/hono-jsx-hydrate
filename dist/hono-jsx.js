@@ -1,0 +1,120 @@
+import {
+  ErrorBoundary,
+  Suspense
+} from "./chunk-IDWF2FVG.js";
+import "./chunk-KB5TVUAL.js";
+import "./chunk-LPQFXR7P.js";
+import {
+  useActionState,
+  useOptimistic
+} from "./chunk-MC2LGV2Z.js";
+import {
+  createRef,
+  forwardRef,
+  startTransition,
+  startViewTransition,
+  use,
+  useCallback,
+  useDebugValue,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useInsertionEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  useViewTransition
+} from "./chunk-SAPHTOIM.js";
+import {
+  Children,
+  Fragment,
+  cloneElement,
+  createContext2 as createContext,
+  isValidElement,
+  jsx,
+  memo,
+  reactAPICompatVersion,
+  useContext
+} from "./chunk-V4X66CWH.js";
+import "./chunk-MLKGABMK.js";
+
+// src/jsx/index.ts
+var jsx_default = {
+  version: reactAPICompatVersion,
+  memo,
+  Fragment,
+  StrictMode: Fragment,
+  isValidElement,
+  createElement: jsx,
+  cloneElement,
+  ErrorBoundary,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useReducer,
+  useId,
+  useDebugValue,
+  use,
+  startTransition,
+  useTransition,
+  useDeferredValue,
+  startViewTransition,
+  useViewTransition,
+  useMemo,
+  useLayoutEffect,
+  useInsertionEffect,
+  createRef,
+  forwardRef,
+  useImperativeHandle,
+  useSyncExternalStore,
+  useActionState,
+  useOptimistic,
+  Suspense,
+  Children
+};
+export {
+  Children,
+  ErrorBoundary,
+  Fragment,
+  Fragment as StrictMode,
+  Suspense,
+  cloneElement,
+  createContext,
+  jsx as createElement,
+  createRef,
+  jsx_default as default,
+  forwardRef,
+  isValidElement,
+  jsx,
+  memo,
+  startTransition,
+  startViewTransition,
+  use,
+  useActionState,
+  useCallback,
+  useContext,
+  useDebugValue,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useInsertionEffect,
+  useLayoutEffect,
+  useMemo,
+  useOptimistic,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  useViewTransition,
+  reactAPICompatVersion as version
+};
