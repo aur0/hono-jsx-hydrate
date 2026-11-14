@@ -68,11 +68,13 @@ This package keeps Hono's JSX and DOM component model. It patches the runtime; i
 | Hono version | `hono@4.13.17` | The peer dependency is pinned to the version this patch was built against. |
 | JSX runtimes | `hono/jsx`, `hono/jsx/jsx-runtime`, `hono/jsx/jsx-dev-runtime` | Use `hono/jsx` for server rendering. |
 | DOM JSX runtimes | `hono/jsx/dom`, `hono/jsx/dom/jsx-runtime`, `hono/jsx/dom/jsx-dev-runtime` | Use `hono/jsx/dom` as the client JSX import source. |
+| DOM CSS helpers | `hono/jsx/dom/css` | Hono DOM CSS and view-transition helpers. |
 | Client rendering | `render`, `createRoot`, `root.render`, `root.unmount` | For client-only UI, use Hono's DOM renderer. |
 | Server rendering | `renderToString`, `renderToReadableStream` | The synchronous `renderToString` API supports `identifierPrefix`. |
 | Hydration | `hydrateRoot` | Attaches to completed server-rendered HTML and adopts matching DOM nodes. |
 | Hooks and transitions | `useState`, `useEffect`, `useRef`, `useCallback`, `use`, `useMemo`, `useReducer`, `useId`, `useSyncExternalStore`, `useLayoutEffect`, `useInsertionEffect`, `useDebugValue`, `useImperativeHandle`, `useTransition`, `useDeferredValue`, `useFormStatus`, `useActionState`, `useOptimistic`, `startTransition`, `startViewTransition`, `useViewTransition` | Hono's React-compatible or partially compatible APIs; see the [Hono Client Components guide](https://hono.dev/docs/guides/jsx-dom) for Hono's compatibility notes. |
 | Component APIs | `createContext`, `useContext`, `createElement`, `cloneElement`, `memo`, `forwardRef`, `createRef`, `Children`, `Suspense`, `ErrorBoundary` | Available through the Hono DOM JSX runtime, with Hono's compatibility behavior. |
+| Other DOM APIs | `createPortal`, `flushSync`, `StrictMode`, `isValidElement`, `version` | Exported by the Hono DOM JSX runtime. |
 | Mismatch recovery | `onRecoverableError` | A structural or text mismatch reports an error and renders a replacement root. |
 | Vite integration | Aliases for Hono JSX entry points | The README's Vite example points all entry points at the package's shared ESM graph. |
 | Other bundlers | Use equivalent aliases or resolver plugins | Make all related entry points resolve to these same built files so they share hook state. This package does not currently ship a bundler plugin. |
@@ -85,6 +87,15 @@ Hydration is whole-root and intended for completed SSR output. Actively streamin
 - Matching nodes are adopted and retain user-entered form values.
 - A structural or text mismatch reports an error and replaces the root.
 - Actively streaming Suspense boundaries, selective hydration, pre-hydration event replay, and deterministic IDs across concurrent async SSR are not supported.
+
+## Verification
+
+- The published GitHub package installed in a clean npm project; its package build and direct ESM/SSR import smoke check passed.
+- The 18 browser hydration compatibility scenarios passed using the GitHub-installed package source.
+- A clean Vite production build passed using the alias configuration above.
+- The shipped source passed Hono's upstream DOM, hooks, and server suite: 1,022 passed, 6 skipped, across 18 test files.
+
+These checks cover the published source, runtime exports, hydration behavior, and the documented Vite alias setup. They do not test every listed API independently in every supported bundler.
 
 ## Development
 
