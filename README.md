@@ -14,11 +14,13 @@ This project is derived from Hono v4.13.17 (commit `61f7c59e50244ab4d2dd83c15192
 
 ## Install from GitHub
 
+You do **not** need Bun. This is an ESM package that works with npm, pnpm, Yarn, or Bun; the Vite plugin works with Vite and does not use Bun's bundler.
+
 ```sh
 npm install github:aur0/hono-jsx-hydrate
 ```
 
-You can also install it with Bun using `bun add github:aur0/hono-jsx-hydrate`.
+The GitHub repository is public, so npm can install it directly from GitHub. For example, with pnpm use `pnpm add github:aur0/hono-jsx-hydrate`. This uses npm as the installer, but the package is not published to the npm registry yet; a registry release can be done separately.
 
 The package pins its peer dependency to Hono 4.13.17. Your application code continues importing from `hono/jsx` and `hono/jsx/dom`; configure your bundler to resolve those specifiers to this package's patched, shared build. The package also has direct `hono-jsx-hydrate/jsx/...` exports for explicit use, but mixing direct package paths and Hono paths can load duplicate runtime state. Use one resolution strategy throughout the app.
 
@@ -60,7 +62,7 @@ Serve the compiled client entry at `/client.js`. Hydration adopts the server but
 
 ### Vite
 
-The Vite plugin replaces the nine manual aliases:
+The Vite plugin maps all supported `hono/jsx` and `hono/jsx/dom` imports to the shared patched runtime:
 
 ```ts
 import { defineConfig } from 'vite'
@@ -72,6 +74,8 @@ export default defineConfig({
 ```
 
 Set the JSX import source in your TypeScript config: `hono/jsx/dom` for browser components and `hono/jsx` for server-rendered JSX. The plugin redirects those runtime imports; it does not change JSX compilation settings.
+
+The plugin was integration-tested with Vite 8.3.8 in dev, a production client preview, and a production SSR build. It excludes the mapped runtime imports from dependency prebundling, deduplicates Hono, and keeps the patched runtime internal to SSR builds. It requires exactly `hono@4.13.17` and reports a config error when the app resolves another version. Other Vite versions and deployment SSR adapters have not been verified.
 
 ### Bun's native bundler
 
@@ -145,7 +149,7 @@ This package keeps Hono's JSX and DOM component model. It patches the runtime; i
 | Component APIs | `createContext`, `useContext`, `createElement`, `cloneElement`, `memo`, `forwardRef`, `createRef`, `Children`, `Suspense`, `ErrorBoundary` | Available through the Hono DOM JSX runtime, with Hono's compatibility behavior. |
 | Other DOM APIs | `createPortal`, `flushSync`, `StrictMode`, `isValidElement`, `version` | Exported by the Hono DOM JSX runtime. |
 | Mismatch recovery | `onRecoverableError` | A structural or text mismatch reports an error and renders a replacement root. |
-| Vite integration | `hono-jsx-hydrate/vite` plugin | Redirects Hono JSX entry points to the package's shared ESM graph. |
+| Vite integration | `hono-jsx-hydrate/vite` plugin | Vite 8.3.8 dev, client production preview, and SSR builds are integration-tested. |
 | Bun integration | `hono-jsx-hydrate/bun` plugin | Redirects Hono JSX entry points when using `Bun.build()`. |
 | Other bundlers | Equivalent aliases or resolver plugins | Resolve all related Hono JSX entry points to this package's shared build. |
 

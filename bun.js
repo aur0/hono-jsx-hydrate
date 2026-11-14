@@ -1,21 +1,9 @@
 import { fileURLToPath } from 'node:url'
+import { runtimeEntrypoints } from './runtime-entrypoints.js'
 
-const entries = {
-  'hono/jsx': 'hono-jsx.js',
-  'hono/jsx/jsx-runtime': 'hono-jsx-jsx-runtime.js',
-  'hono/jsx/jsx-dev-runtime': 'hono-jsx-jsx-dev-runtime.js',
-  'hono/jsx/streaming': 'hono-jsx-streaming.js',
-  'hono/jsx/dom': 'hono-jsx-dom.js',
-  'hono/jsx/dom/jsx-runtime': 'hono-jsx-dom-jsx-runtime.js',
-  'hono/jsx/dom/jsx-dev-runtime': 'hono-jsx-dom-jsx-dev-runtime.js',
-  'hono/jsx/dom/client': 'hono-jsx-dom-client.js',
-  'hono/jsx/dom/css': 'hono-jsx-dom-css.js',
-  'hono/jsx/dom/server': 'hono-jsx-dom-server.js',
-}
-
-const resolvedEntries = Object.fromEntries(Object.entries(entries).map(([specifier, file]) => [
+const resolvedEntries = Object.fromEntries(Object.entries(runtimeEntrypoints).map(([specifier, entry]) => [
   specifier,
-  fileURLToPath(new URL(`./dist/${file}`, import.meta.url)),
+  fileURLToPath(new URL(`./dist/${entry.file}`, import.meta.url)),
 ]))
 
 /**

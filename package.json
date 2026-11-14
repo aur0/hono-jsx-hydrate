@@ -63,6 +63,7 @@
     "README.md",
     "bun.js",
     "bun.d.ts",
+    "runtime-entrypoints.js",
     "vite.js",
     "vite.d.ts"
   ],
@@ -73,7 +74,13 @@
     "test:hydration": "node test/hydration-compatibility.mjs"
   },
   "peerDependencies": {
-    "hono": "4.13.17"
+    "hono": "4.13.17",
+    "vite": ">=8 <9"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",

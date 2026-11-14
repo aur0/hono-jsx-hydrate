@@ -1,11 +1,3 @@
-export interface HonoJsxHydrateVitePlugin {
-  name: string
-  enforce: 'pre'
-  config(): {
-    resolve: {
-      alias: Array<{ find: RegExp; replacement: string }>
-    }
-  }
-}
+import type { Plugin } from 'vite'
 
-export declare function honoJsxHydrateVitePlugin(): HonoJsxHydrateVitePlugin
+export declare function honoJsxHydrateVitePlugin(): Plugin
