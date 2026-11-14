@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert'
 import { Hono } from 'hono'
-import { jsx } from '../dist/hono-jsx.js'
-import { renderToString } from '../dist/hono-jsx-dom-server.js'
+import { jsx } from 'hono/jsx'
+import { renderToString } from 'hono/jsx/dom/server'
 
 const app = new Hono()
 app.get('/', (context) => context.html(

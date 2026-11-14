@@ -77,6 +77,45 @@ Set the JSX import source in your TypeScript config: `hono/jsx/dom` for browser 
 
 The plugin was integration-tested with Vite 8.3.8 in dev, a production client preview, and a production SSR build. It excludes the mapped runtime imports from dependency prebundling, deduplicates Hono, and keeps the patched runtime internal to SSR builds. It requires exactly `hono@4.13.17` and reports a config error when the app resolves another version. Other Vite versions and deployment SSR adapters have not been verified.
 
+## Other bundlers and Deno
+
+Rollup and Rolldown have native resolver plugins:
+
+```js
+import { honoJsxHydrateRollupPlugin } from 'hono-jsx-hydrate/rollup'
+
+export default {
+  plugins: [honoJsxHydrateRollupPlugin()],
+}
+```
+
+For Rolldown, import `honoJsxHydrateRolldownPlugin` from `hono-jsx-hydrate/rolldown` and add it to the `plugins` array.
+
+Webpack and Rspack plugins go in the top-level `plugins` array:
+
+```js
+import { honoJsxHydrateWebpackPlugin } from 'hono-jsx-hydrate/webpack'
+
+export default {
+  plugins: [honoJsxHydrateWebpackPlugin()],
+}
+```
+
+For Rspack, import `honoJsxHydrateRspackPlugin` from `hono-jsx-hydrate/rspack`.
+
+Parcel requires a separate resolver package because Parcel requires resolver plugins to use the `parcel-resolver-*` package naming convention. Install `parcel-resolver-hono-jsx-hydrate` alongside `hono-jsx-hydrate`, then add it before the default resolver in `.parcelrc`:
+
+```json
+{
+  "extends": "@parcel/config-default",
+  "resolvers": ["parcel-resolver-hono-jsx-hydrate", "..."]
+}
+```
+
+Deno does not expose a bundler plugin API; use the provided import map in `deno.imports.json` as the Deno-native integration. Merge its `imports` entries into your app's `deno.json` and keep importing from `hono/jsx` and `hono/jsx/dom`.
+
+These integrations redirect all supported Hono JSX entry points to the package's shared runtime. The JSX compiler source remains your choice: use `hono/jsx` for server JSX and `hono/jsx/dom` for browser JSX.
+
 ### Bun's native bundler
 
 For `Bun.build()`, use the package plugin to redirect Hono JSX imports to the shared patched runtime. Keep the component imports as `hono/jsx` or `hono/jsx/dom`; the plugin handles their resolution.
@@ -151,7 +190,9 @@ This package keeps Hono's JSX and DOM component model. It patches the runtime; i
 | Mismatch recovery | `onRecoverableError` | A structural or text mismatch reports an error and renders a replacement root. |
 | Vite integration | `hono-jsx-hydrate/vite` plugin | Vite 8.3.8 dev, client production preview, and SSR builds are integration-tested. |
 | Bun integration | `hono-jsx-hydrate/bun` plugin | Redirects Hono JSX entry points when using `Bun.build()`. |
-| Other bundlers | Equivalent aliases or resolver plugins | Resolve all related Hono JSX entry points to this package's shared build. |
+| Rollup, Rolldown, Webpack, and Rspack | Bundler-specific resolver plugins | Automatically redirect the supported Hono JSX entry points to the shared runtime. |
+| Parcel | `parcel-resolver-hono-jsx-hydrate` companion resolver | Parcel requires a separately named resolver package. |
+| Deno | `deno.imports.json` import map | Deno has no bundler plugin API; copy the map into the app's config. |
 
 Hydration is whole-root and intended for completed SSR output. Actively streaming Suspense boundaries, selective hydration, event replay before hydration, and deterministic IDs across concurrent async SSR are not supported.
 
@@ -174,12 +215,12 @@ The repository includes browser regression coverage for DOM adoption, SSR IDs, s
 | Bun | Bun 1.4.4 `Bun.build()` smoke build through `honoJsxHydrateBunPlugin()` | CI checks bundling; this does not exercise a Bun-hosted HTTP server. |
 | Cloudflare Workers | Hono SSR runs in Miniflare 4.20260730.0's local Workerd runtime; the resulting HTML hydrates in Chromium | This is a local simulator test, not a deployment to Cloudflare's hosted network. |
 | Node.js | Vite SSR output is imported in Node and compared with dev SSR output | Other Node server adapters are not tested. |
-| Deno | Deno 2.9.6 runs Hono SSR against the built ESM runtime | Tests server rendering; browser hydration in Deno Deploy is not tested. |
-| Rollup | Rollup 4.68.3 bundles a consumer entry; Chromium verifies DOM adoption and state updates | Uses explicit entry aliases; no Rollup plugin is shipped. |
-| Webpack | Webpack 5.112.2 production bundle; Chromium verifies DOM adoption and state updates | Uses explicit resolver aliases; no Webpack plugin is shipped. |
-| Rspack | Rspack 2.3.2 production bundle; Chromium verifies DOM adoption and state updates | Uses explicit resolver aliases; no Rspack plugin is shipped. |
-| Parcel | Parcel 2.16.4 production bundle; Chromium verifies DOM adoption and state updates | Uses `package.json` aliases; no Parcel plugin is shipped. |
-| Rolldown | Rolldown 1.3.2 bundle; Chromium verifies DOM adoption and state updates | Uses `resolve.alias`; no Rolldown plugin is shipped. |
+| Deno | Deno 2.9.6 import map redirects Hono JSX entry points to the built ESM runtime; Hono SSR is verified | Tests server rendering; browser hydration in Deno Deploy is not tested. |
+| Rollup | Rollup 4.68.3 plugin resolves a consumer bundle; Chromium verifies DOM adoption and state updates | Plugin resolver behavior is tested; production app/server configurations beyond the fixture are not. |
+| Webpack | Webpack 5.112.2 plugin builds a production bundle; Chromium verifies DOM adoption and state updates | Plugin resolver behavior is tested; other Webpack modes are not. |
+| Rspack | Rspack 2.3.2 plugin builds a production bundle; Chromium verifies DOM adoption and state updates | Plugin resolver behavior is tested; other Rspack modes are not. |
+| Parcel | Parcel 2.16.4 companion resolver builds a production bundle; Chromium verifies DOM adoption and state updates | Resolver integration is tested in the fixture; other Parcel pipelines are not. |
+| Rolldown | Rolldown 1.3.2 plugin builds a consumer bundle; Chromium verifies DOM adoption and state updates | Plugin resolver behavior is tested; production app/server configurations beyond the fixture are not. |
 
 GitHub Actions runs the Node/Vite/esbuild/Worker checks, Chromium/Firefox/WebKit hydration matrix, Bun bundler smoke test, Deno SSR check, and separate bundler jobs for Rollup, Webpack, Rspack, Parcel, and Rolldown on pushes and pull requests. The separate upstream Hono suite is useful for broader compatibility checks but is maintained outside this repo.
 

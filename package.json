@@ -54,6 +54,25 @@
     "./vite": {
       "types": "./vite.d.ts",
       "import": "./vite.js"
+    },
+    "./rollup": {
+      "types": "./rollup.d.ts",
+      "import": "./rollup.js"
+    },
+    "./rolldown": {
+      "types": "./rolldown.d.ts",
+      "import": "./rolldown.js"
+    },
+    "./webpack": {
+      "types": "./webpack.d.ts",
+      "import": "./webpack.js"
+    },
+    "./rspack": {
+      "types": "./webpack.d.ts",
+      "import": "./webpack.js"
+    },
+    "./runtime-resolver": {
+      "import": "./runtime-resolver.js"
     }
   },
   "files": [
@@ -63,7 +82,15 @@
     "README.md",
     "bun.js",
     "bun.d.ts",
+    "deno.imports.json",
+    "rollup.js",
+    "rollup.d.ts",
+    "rolldown.js",
+    "rolldown.d.ts",
     "runtime-entrypoints.js",
+    "runtime-resolver.js",
+    "webpack.js",
+    "webpack.d.ts",
     "vite.js",
     "vite.d.ts"
   ],
@@ -79,14 +106,22 @@
     "test:parcel": "node test/parcel-smoke.mjs",
     "test:rolldown": "node test/rolldown-smoke.mjs",
     "test:bundlers": "npm run test:rollup && npm run test:webpack && npm run test:rspack && npm run test:parcel && npm run test:rolldown",
-    "test:deno": "deno run --allow-all test/deno-smoke.ts",
+    "test:deno": "node test/deno-importmap.mjs",
     "test:hydration": "node test/hydration-compatibility.mjs"
   },
   "peerDependencies": {
     "hono": "4.13.17",
+    "@rspack/core": "^2",
+    "rolldown": "^1",
+    "rollup": "^4",
+    "webpack": "^5",
     "vite": ">=8 <9"
   },
   "peerDependenciesMeta": {
+    "@rspack/core": { "optional": true },
+    "rolldown": { "optional": true },
+    "rollup": { "optional": true },
+    "webpack": { "optional": true },
     "vite": {
       "optional": true
     }
@@ -97,7 +132,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "@rollup/plugin-alias": "^6.0.1",
     "@rspack/core": "^2.3.2",
     "esbuild": "^0.28.2",
     "hono": "4.13.17",

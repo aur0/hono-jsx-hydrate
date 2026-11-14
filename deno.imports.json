@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "hono/jsx": "npm:hono-jsx-hydrate/jsx",
+    "hono/jsx/jsx-runtime": "npm:hono-jsx-hydrate/jsx/jsx-runtime",
+    "hono/jsx/jsx-dev-runtime": "npm:hono-jsx-hydrate/jsx/jsx-dev-runtime",
+    "hono/jsx/streaming": "npm:hono-jsx-hydrate/jsx/streaming",
+    "hono/jsx/dom": "npm:hono-jsx-hydrate/jsx/dom",
+    "hono/jsx/dom/jsx-runtime": "npm:hono-jsx-hydrate/jsx/dom/jsx-runtime",
+    "hono/jsx/dom/jsx-dev-runtime": "npm:hono-jsx-hydrate/jsx/dom/jsx-dev-runtime",
+    "hono/jsx/dom/client": "npm:hono-jsx-hydrate/jsx/dom/client",
+    "hono/jsx/dom/css": "npm:hono-jsx-hydrate/jsx/dom/css",
+    "hono/jsx/dom/server": "npm:hono-jsx-hydrate/jsx/dom/server"
+  }
+}
