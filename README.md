@@ -2,6 +2,12 @@
 
 A patched [Hono](https://hono.dev/) JSX runtime that adds whole-root hydration for completed server-rendered HTML.
 
+## Why this exists
+
+Hono JSX includes **Client Components**: an interactive browser UI model using `hono/jsx/dom`, with a JSX renderer and React-like hooks. This package adds hydration so a Hono JSX view can render HTML on the server first, then attach its client behavior to that HTML.
+
+That makes it an option for small interactive apps or page features when you want JSX, state, and SSR but do not need React's full rendering model or package ecosystem. Hono's APIs are React-like, not a drop-in replacement for React; React-specific packages generally will not work with this runtime. For very simple interactions, custom JavaScript may be smaller still. Choose based on the UI and libraries you need.
+
 The patch adopts matching server-rendered DOM with `hydrateRoot`, preserves live form values while attaching, reports markup mismatches through `onRecoverableError` and renders a replacement root when markup does not match. It also fixes Suspense retry props/state updates and scopes synchronous SSR IDs with `identifierPrefix`.
 
 This project is derived from Hono v4.13.17 (commit `61f7c59e50244ab4d2dd83c151928cf7ea448510`). Hono's MIT license is retained in [LICENSE](./LICENSE). Hono routing and RPC are not modified.
